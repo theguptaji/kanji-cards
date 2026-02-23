@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { Eye, CheckCircle, RefreshCcw, Info } from 'lucide-react';
+import { Eye, CheckCircle, RefreshCcw, Info, Edit3 } from 'lucide-react';
 import { useProgress } from '../context/ProgressContext';
 
 const KanjiCard = ({ kanjiData }) => {
   const [isFlipped, setIsFlipped] = useState(false);
-  const { progress, updateProgress } = useProgress();
+  const { progress, updateProgress, notes, updateNote } = useProgress();
 
   const status = progress[kanjiData.id] || 'unseen';
+  const currentNote = notes[kanjiData.id] || '';
 
   const handleMark = (e, newStatus) => {
     e.stopPropagation();
@@ -76,6 +77,30 @@ const KanjiCard = ({ kanjiData }) => {
                   </li>
                 ))}
               </ul>
+            </div>
+
+            <div style={{ marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--primary)', marginBottom: '4px' }}>
+                <Edit3 size={16} /> <span style={{ fontWeight: 600 }}>My Notes</span>
+              </div>
+              <textarea 
+                value={currentNote}
+                onChange={(e) => updateNote(kanjiData.id, e.target.value)}
+                onClick={(e) => e.stopPropagation()}
+                placeholder="Add your own associations or memory hooks..."
+                style={{ 
+                  width: '100%', 
+                  background: 'rgba(0,0,0,0.2)', 
+                  border: '1px solid var(--card-border)', 
+                  padding: '12px', 
+                  borderRadius: '8px',
+                  color: 'var(--text-primary)',
+                  fontFamily: 'inherit',
+                  resize: 'vertical',
+                  minHeight: '80px',
+                  boxSizing: 'border-box'
+                }}
+              />
             </div>
           </div>
 

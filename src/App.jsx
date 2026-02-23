@@ -3,12 +3,12 @@ import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-route
 import { ProgressProvider, useProgress } from './context/ProgressContext';
 import StudyInterface from './pages/StudyInterface';
 import LevelTest from './pages/LevelTest';
-import { BookOpen, GraduationCap, Flame, Star, Zap, RefreshCcw } from 'lucide-react';
+import { BookOpen, GraduationCap, Flame, Star, Zap, RefreshCcw, Edit3 } from 'lucide-react';
 import { fetchMetadata, fetchKanjiLevel } from './data/api';
 
 const Home = () => {
   const navigate = useNavigate();
-  const { progress } = useProgress();
+  const { progress, notes } = useProgress();
 
   const [metadata, setMetadata] = useState({});
   const [decks, setDecks] = useState({});
@@ -25,6 +25,10 @@ const Home = () => {
   const revisitKanji = Object.values(decks)
     .flat()
     .filter(k => progress[k.id] === 'revisit');
+
+  const kanjiWithNotes = Object.values(decks)
+    .flat()
+    .filter(k => notes && notes[k.id]);
 
   return (
     <div style={{ padding: '40px', maxWidth: '1200px', margin: '0 auto' }}>
@@ -117,6 +121,45 @@ const Home = () => {
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                   <span style={{ fontSize: '0.8rem', color: 'var(--status-revisit)', fontWeight: 600 }}>{kanji.level}</span>
                   <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>{kanji.meanings[0]}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {kanjiWithNotes.length > 0 && (
+        <div className="glass-panel animate-slide-up delay-5" style={{ marginTop: '40px', padding: '32px' }}>
+          <h2 style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '0 0 24px 0', fontSize: '1.5rem', color: 'var(--primary)' }}>
+            <div style={{ background: 'rgba(157, 78, 221, 0.2)', padding: '8px', borderRadius: '50%', display: 'flex' }}>
+              <Edit3 size={20} color="var(--primary)" /> 
+            </div>
+            My Notes ({kanjiWithNotes.length})
+          </h2>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', maxHeight: '300px', overflowY: 'auto' }}>
+            {kanjiWithNotes.map(kanji => (
+              <div 
+                key={kanji.id} 
+                className="hover-scale"
+                style={{ 
+                  background: 'rgba(255, 255, 255, 0.05)', 
+                  border: '1px solid var(--card-border)', 
+                  padding: '12px 20px', 
+                  borderRadius: '16px', 
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  cursor: 'pointer'
+                }}
+                title={notes[kanji.id]}
+                onClick={() => navigate(`/study/${kanji.level}`)}
+              >
+                <span style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', textShadow: '0 0 10px rgba(157, 78, 221, 0.3)' }}>{kanji.character}</span>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 600 }}>{kanji.level}</span>
+                  <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {notes[kanji.id]}
+                  </span>
                 </div>
               </div>
             ))}

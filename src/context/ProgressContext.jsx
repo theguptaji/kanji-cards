@@ -6,11 +6,16 @@ export const useProgress = () => useContext(ProgressContext);
 
 export const ProgressProvider = ({ children }) => {
   const [progress, setProgress] = useState({});
+  const [notes, setNotes] = useState({});
 
   useEffect(() => {
-    const saved = localStorage.getItem('kanjiProgress');
-    if (saved) {
-      setProgress(JSON.parse(saved));
+    const savedProgress = localStorage.getItem('kanjiProgress');
+    if (savedProgress) {
+      setProgress(JSON.parse(savedProgress));
+    }
+    const savedNotes = localStorage.getItem('kanjiNotes');
+    if (savedNotes) {
+      setNotes(JSON.parse(savedNotes));
     }
   }, []);
 
@@ -20,13 +25,24 @@ export const ProgressProvider = ({ children }) => {
     localStorage.setItem('kanjiProgress', JSON.stringify(newProgress));
   };
 
+  const updateNote = (kanjiId, note) => {
+    const newNotes = { ...notes, [kanjiId]: note };
+    if (!note) {
+      delete newNotes[kanjiId];
+    }
+    setNotes(newNotes);
+    localStorage.setItem('kanjiNotes', JSON.stringify(newNotes));
+  };
+
   const resetProgress = () => {
     setProgress({});
+    setNotes({});
     localStorage.removeItem('kanjiProgress');
+    localStorage.removeItem('kanjiNotes');
   };
 
   return (
-    <ProgressContext.Provider value={{ progress, updateProgress, resetProgress }}>
+    <ProgressContext.Provider value={{ progress, updateProgress, notes, updateNote, resetProgress }}>
       {children}
     </ProgressContext.Provider>
   );

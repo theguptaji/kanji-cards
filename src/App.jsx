@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-route
 import { ProgressProvider, useProgress } from './context/ProgressContext';
 import StudyInterface from './pages/StudyInterface';
 import LevelTest from './pages/LevelTest';
-import { BookOpen, GraduationCap, Flame, Star, Zap, RefreshCcw, Edit3 } from 'lucide-react';
-import { fetchMetadata, fetchKanjiLevel } from './data/api';
+import { BookOpen, GraduationCap, Flame, Star, Zap, RefreshCcw, Edit3, Search } from 'lucide-react';
+import { fetchMetadata, fetchKanjiLevel, fetchSearchIndex } from './data/api';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -12,13 +12,29 @@ const Home = () => {
 
   const [metadata, setMetadata] = useState({});
   const [decks, setDecks] = useState({});
+  const [searchIndex, setSearchIndex] = useState([]);
+  const [query, setQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
 
   useEffect(() => {
     fetchMetadata().then(setMetadata);
+    fetchSearchIndex().then(setSearchIndex);
     ['N5', 'N4', 'N3', 'N2', 'N1'].forEach(l => {
         fetchKanjiLevel(l).then(data => setDecks(prev => ({ ...prev, [l]: data })));
     });
   }, []);
+
+  useEffect(() => {
+    if (!query.trim() || !searchIndex.length) {
+      setSearchResults([]);
+      return;
+    }
+    const lowerQuery = query.toLowerCase();
+    const results = searchIndex.filter(k => 
+      k.character.includes(lowerQuery)
+    ).slice(0, 10);
+    setSearchResults(results);
+  }, [query, searchIndex]);
 
   const levels = ['N5', 'N4', 'N3', 'N2', 'N1'];
 
@@ -32,14 +48,44 @@ const Home = () => {
 
   return (
     <div style={{ padding: '40px', maxWidth: '1200px', margin: '0 auto' }}>
-      <header className="animate-slide-up" style={{ textAlign: 'center', marginBottom: '60px' }}>
+      <header className="animate-slide-up" style={{ textAlign: 'center', marginBottom: '60px', position: 'relative', zIndex: 50 }}>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
             <img src="/favicon.png" alt="Kanjify Logo" style={{ width: '96px', height: '96px', borderRadius: '24px', boxShadow: '0 0 30px rgba(157, 78, 221, 0.5)', objectFit: 'cover' }} />
         </div>
         <h1 className="text-gradient" style={{ fontSize: '4rem', marginBottom: '16px' }}>Kanjify</h1>
-        <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', maxWidth: '600px', margin: '0 auto' }}>
+        <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', maxWidth: '600px', margin: '0 auto', marginBottom: '32px' }}>
           Master Japanese characters from JLPT N5 to N1 with hackable mnemonics, micro-animations, and game-like progression.
         </p>
+        
+        <div style={{ position: 'relative', maxWidth: '600px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--card-border)', borderRadius: '24px', padding: '12px 24px' }}>
+            <Search size={20} color="var(--text-secondary)" style={{ marginRight: '12px' }} />
+            <input 
+              type="text" 
+              placeholder="Search Kanji character (e.g. 学, 水)..." 
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              style={{ flex: 1, background: 'transparent', border: 'none', color: 'var(--text-primary)', fontSize: '1.1rem', outline: 'none' }}
+            />
+          </div>
+          {searchResults.length > 0 && (
+            <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: '8px', background: 'var(--bg-base)', border: '1px solid var(--card-border)', borderRadius: '16px', zIndex: 10, padding: '12px', boxShadow: '0 10px 40px rgba(0,0,0,0.5)', maxHeight: '300px', overflowY: 'auto' }}>
+              {searchResults.map((res, i) => (
+                <div 
+                  key={res.id} 
+                  onClick={() => navigate(`/study/${res.level}?id=${res.id}`)}
+                  className="hover-scale"
+                  style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '12px', borderBottom: i < searchResults.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none', cursor: 'pointer', textAlign: 'left', borderRadius: '8px' }}
+                >
+                  <span style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', textShadow: '0 0 10px rgba(255, 209, 102, 0.3)' }}>{res.character}</span>
+                  <div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-secondary)' }}>JLPT {res.level}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </header>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>

@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "fetch-data": "node scripts/fetchKanjiData.js"
+    "fetch-data": "node scripts/fetchKanjiData.js && node scripts/buildSearchIndex.js"
   },
   "dependencies": {
     "lucide-react": "^0.575.0",

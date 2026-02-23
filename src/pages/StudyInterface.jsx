@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { fetchKanjiLevel } from '../data/api';
 import KanjiCard from '../components/KanjiCard';
 import { ArrowLeft, ArrowRight, Home } from 'lucide-react';
@@ -7,13 +7,24 @@ import { ArrowLeft, ArrowRight, Home } from 'lucide-react';
 const StudyInterface = () => {
   const { level } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   
   const [deck, setDeck] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    fetchKanjiLevel(level).then(setDeck);
-  }, [level]);
+    fetchKanjiLevel(level).then(data => {
+      setDeck(data);
+      if (data) {
+        const queryParams = new URLSearchParams(location.search);
+        const targetId = queryParams.get('id');
+        if (targetId) {
+          const idx = data.findIndex(k => k.id === targetId);
+          if (idx !== -1) setCurrentIndex(idx);
+        }
+      }
+    });
+  }, [level, location.search]);
 
   if (!deck) {
     return <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading Kanji data...</div>;

@@ -36,3 +36,21 @@ export async function fetchMetadata() {
         return { N5: 0, N4: 0, N3: 0, N2: 0, N1: 0 };
     }
 }
+
+/**
+ * Loads the search index containing Kanji, readings, and meanings
+ */
+export async function fetchSearchIndex() {
+    if (cache['searchIndex']) return cache['searchIndex'];
+    
+    try {
+        const response = await fetch('/data/search.json');
+        if (!response.ok) throw new Error("Network response was not ok");
+        const data = await response.json();
+        cache['searchIndex'] = data;
+        return data;
+    } catch (error) {
+        console.error("Failed to load search index:", error);
+        return [];
+    }
+}

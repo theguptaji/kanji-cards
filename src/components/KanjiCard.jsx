@@ -83,14 +83,24 @@ const KanjiCard = ({ kanjiData }) => {
           <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
             <button 
               className="glass-button" 
-              style={{ flex: 1, backgroundColor: status === 'revisit' ? 'rgba(255, 209, 102, 0.2)' : '' }}
+              style={{ 
+                flex: 1, 
+                backgroundColor: status === 'revisit' ? 'rgba(255, 209, 102, 0.2)' : '',
+                border: status === 'revisit' ? '1px solid var(--status-revisit)' : '1px solid var(--card-border)',
+                color: status === 'revisit' ? 'var(--status-revisit)' : 'var(--text-primary)'
+              }}
               onClick={(e) => handleMark(e, 'revisit')}
             >
               <RefreshCcw size={18} /> Revisit
             </button>
             <button 
               className="glass-button primary" 
-              style={{ flex: 1, backgroundColor: status === 'learned' ? 'var(--status-learned)' : '' }}
+              style={{ 
+                flex: 1, 
+                backgroundColor: status === 'learned' ? 'rgba(6, 214, 160, 0.2)' : 'var(--text-primary)',
+                border: status === 'learned' ? '1px solid var(--status-learned)' : '1px solid transparent',
+                color: status === 'learned' ? 'var(--status-learned)' : 'var(--background)'
+              }}
               onClick={(e) => handleMark(e, 'learned')}
             >
               <CheckCircle size={18} /> Learned

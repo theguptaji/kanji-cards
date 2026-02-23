@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-route
 import { ProgressProvider, useProgress } from './context/ProgressContext';
 import StudyInterface from './pages/StudyInterface';
 import LevelTest from './pages/LevelTest';
-import { BookOpen, GraduationCap, Flame, Star, Zap } from 'lucide-react';
+import { BookOpen, GraduationCap, Flame, Star, Zap, RefreshCcw } from 'lucide-react';
 import { fetchMetadata, fetchKanjiLevel } from './data/api';
 
 const Home = () => {
@@ -21,6 +21,10 @@ const Home = () => {
   }, []);
 
   const levels = ['N5', 'N4', 'N3', 'N2', 'N1'];
+
+  const revisitKanji = Object.values(decks)
+    .flat()
+    .filter(k => progress[k.id] === 'revisit');
 
   return (
     <div style={{ padding: '40px', maxWidth: '1200px', margin: '0 auto' }}>
@@ -82,6 +86,43 @@ const Home = () => {
           )
         })}
       </div>
+
+      {revisitKanji.length > 0 && (
+        <div className="glass-panel animate-slide-up delay-4" style={{ marginTop: '40px', padding: '32px' }}>
+          <h2 style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '0 0 24px 0', fontSize: '1.5rem', color: 'var(--status-revisit)' }}>
+            <div style={{ background: 'rgba(255, 209, 102, 0.2)', padding: '8px', borderRadius: '50%', display: 'flex' }}>
+              <RefreshCcw size={20} /> 
+            </div>
+            Needs Review ({revisitKanji.length})
+          </h2>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', maxHeight: '300px', overflowY: 'auto' }}>
+            {revisitKanji.map(kanji => (
+              <div 
+                key={kanji.id} 
+                className="hover-scale"
+                style={{ 
+                  background: 'rgba(255, 255, 255, 0.05)', 
+                  border: '1px solid var(--card-border)', 
+                  padding: '12px 20px', 
+                  borderRadius: '16px', 
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  cursor: 'pointer'
+                }}
+                title={kanji.meanings.join(', ')}
+                onClick={() => navigate(`/study/${kanji.level}`)}
+              >
+                <span style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', textShadow: '0 0 10px rgba(255, 209, 102, 0.3)' }}>{kanji.character}</span>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--status-revisit)', fontWeight: 600 }}>{kanji.level}</span>
+                  <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>{kanji.meanings[0]}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="glass-panel animate-slide-up delay-3" style={{ marginTop: '40px', padding: '32px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'space-around', flexWrap: 'wrap', gap: '24px' }}>
          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>

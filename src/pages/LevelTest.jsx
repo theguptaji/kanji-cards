@@ -76,7 +76,7 @@ const LevelTest = () => {
 
   if (showResult) {
     return (
-      <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', height: '100vh', padding: '40px', alignItems: 'center', justifyContent: 'center' }}>
+      <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', height: '100dvh', padding: '40px', alignItems: 'center', justifyContent: 'center' }}>
         <div className="glass-panel" style={{ padding: '40px', textAlign: 'center', maxWidth: '500px', width: '100%' }}>
           <h2 className="text-gradient" style={{ fontSize: '2.5rem', marginBottom: '16px' }}>Test Complete!</h2>
           <div style={{ fontSize: '4rem', fontWeight: 800, margin: '24px 0', textShadow: '0 0 20px rgba(6, 214, 160, 0.4)' }}>
@@ -99,7 +99,7 @@ const LevelTest = () => {
   }
 
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', height: '100vh', padding: '24px' }}>
+    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', height: '100dvh', padding: '24px' }}>
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
         <button className="glass-button" onClick={() => navigate('/')}>
           <Home size={20} /> Home

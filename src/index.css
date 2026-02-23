@@ -46,7 +46,7 @@ body {
   background-color: var(--bg-base);
   background-image: var(--bg-gradient);
   color: var(--text-primary);
-  min-height: 100vh;
+  min-height: 100dvh;
   margin: 0;
   overflow-x: hidden;
   line-height: 1.5;
@@ -57,7 +57,7 @@ body {
 #root {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* Glassmorphism Utilities */

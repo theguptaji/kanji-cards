@@ -18,6 +18,23 @@ const LevelTest = () => {
     fetchKanjiLevel(level).then(setDeck);
   }, [level]);
 
+  // Generate 4 options (1 correct, 3 wrong from other kanji or random)
+  const generateOptions = () => {
+    if (!deck || deck.length === 0) return [];
+    const current = deck[currentQuestionIdx];
+    const allMeanings = deck.flatMap(k => k.meanings[0]);
+    const otherMeanings = allMeanings.filter(m => m !== current.meanings[0]);
+    const shuffledOthers = otherMeanings.sort(() => 0.5 - Math.random()).slice(0, 3);
+    const options = [...shuffledOthers, current.meanings[0]];
+    return options.sort(() => 0.5 - Math.random());
+  };
+
+  // Effect to regenerate options when question changes
+  useEffect(() => {
+    setOptions(generateOptions());
+  // eslint-disable-next-line
+  }, [currentQuestionIdx, deck]);
+
   if (!deck) {
     return <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading Kanji data...</div>;
   }
@@ -33,17 +50,6 @@ const LevelTest = () => {
 
   const currentKanji = deck[currentQuestionIdx];
 
-  // Generate 4 options (1 correct, 3 wrong from other kanji or random)
-  const generateOptions = () => {
-    if (!deck || deck.length === 0) return [];
-    const current = deck[currentQuestionIdx];
-    const allMeanings = deck.flatMap(k => k.meanings[0]);
-    const otherMeanings = allMeanings.filter(m => m !== current.meanings[0]);
-    const shuffledOthers = otherMeanings.sort(() => 0.5 - Math.random()).slice(0, 3);
-    const options = [...shuffledOthers, current.meanings[0]];
-    return options.sort(() => 0.5 - Math.random());
-  };
-
   const handleSelect = (option) => {
     if (selectedOption !== null) return;
     setSelectedOption(option);
@@ -56,7 +62,6 @@ const LevelTest = () => {
     if (currentQuestionIdx < deck.length - 1) {
       setCurrentQuestionIdx(currentQuestionIdx + 1);
       setSelectedOption(null);
-      setOptions(generateOptions()); // Technically this is a bit buggy with react lifecycle, but good enough for a demo
     } else {
       setShowResult(true);
     }
@@ -92,12 +97,6 @@ const LevelTest = () => {
       </div>
     );
   }
-
-  // Effect to regenerate options when question changes
-  useEffect(() => {
-    setOptions(generateOptions());
-  // eslint-disable-next-line
-  }, [currentQuestionIdx, deck]);
 
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', height: '100vh', padding: '24px' }}>

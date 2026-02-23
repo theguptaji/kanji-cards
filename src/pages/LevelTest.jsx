@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { fetchKanjiLevel } from "../data/api";
+import { useProgress } from "../context/ProgressContext";
 import { Home, RefreshCw, ChevronRight } from "lucide-react";
 
 const LevelTest = () => {
   const { level } = useParams();
   const navigate = useNavigate();
+  const { updateMistake } = useProgress();
 
   const [deck, setDeck] = useState(null);
   const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
@@ -69,6 +71,9 @@ const LevelTest = () => {
     setSelectedOption(option);
     if (option === currentKanji.meanings[0]) {
       setScore(score + 1);
+      updateMistake(currentKanji.id, false);
+    } else {
+      updateMistake(currentKanji.id, true);
     }
   };
 

@@ -8,7 +8,7 @@ import { fetchMetadata, fetchKanjiLevel, fetchSearchIndex } from './data/api';
 
 const Home = () => {
   const navigate = useNavigate();
-  const { progress, notes, resetProgressAll, resetNeedsReview, resetNotes, resetAll } = useProgress();
+  const { progress, notes, mistakes, resetProgressAll, resetNeedsReview, resetNotes, resetMistakes, resetAll } = useProgress();
 
   const [metadata, setMetadata] = useState({});
   const [decks, setDecks] = useState({});
@@ -55,6 +55,10 @@ const Home = () => {
   const kanjiWithNotes = Object.values(decks)
     .flat()
     .filter(k => notes && notes[k.id]);
+
+  const testMistakesKanji = Object.values(decks)
+    .flat()
+    .filter(k => mistakes && mistakes[k.id]);
 
   return (
     <div style={{ padding: '40px', maxWidth: '1200px', margin: '0 auto' }}>
@@ -223,6 +227,43 @@ const Home = () => {
         </div>
       )}
 
+      {testMistakesKanji.length > 0 && (
+        <div className="glass-panel animate-slide-up delay-6" style={{ marginTop: '40px', padding: '32px' }}>
+          <h2 style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '0 0 24px 0', fontSize: '1.5rem', color: 'var(--status-hard)' }}>
+            <div style={{ background: 'rgba(239, 71, 111, 0.2)', padding: '8px', borderRadius: '50%', display: 'flex' }}>
+              <AlertTriangle size={20} color="var(--status-hard)" /> 
+            </div>
+            Test Mistakes ({testMistakesKanji.length})
+          </h2>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', maxHeight: '300px', overflowY: 'auto' }}>
+            {testMistakesKanji.map(kanji => (
+              <div 
+                key={kanji.id} 
+                className="hover-scale"
+                style={{ 
+                  background: 'rgba(239, 71, 111, 0.05)', 
+                  border: '1px solid rgba(239, 71, 111, 0.3)', 
+                  padding: '12px 20px', 
+                  borderRadius: '16px', 
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  cursor: 'pointer'
+                }}
+                title={kanji.meanings.join(', ')}
+                onClick={() => navigate(`/study/${kanji.level}?id=${kanji.id}`)}
+              >
+                <span style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', textShadow: '0 0 10px rgba(239, 71, 111, 0.3)' }}>{kanji.character}</span>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--status-hard)', fontWeight: 600 }}>{kanji.level}</span>
+                  <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>{kanji.meanings[0]}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="glass-panel animate-slide-up delay-3" style={{ marginTop: '40px', padding: '32px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'space-around', flexWrap: 'wrap', gap: '24px' }}>
          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
            <div style={{ background: 'rgba(6, 214, 160, 0.2)', padding: '12px', borderRadius: '50%' }}>
@@ -272,6 +313,13 @@ const Home = () => {
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', border: '1px solid rgba(255, 255, 255, 0.1)' }}
           >
             <Trash2 size={18} /> Reset Notes
+          </button>
+          <button 
+            className="glass-button" 
+            onClick={() => openConfirm('Reset Test Mistakes', 'Are you sure you want to clear all your test mistakes?', () => { resetMistakes(); closeConfirm(); })}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', border: '1px solid rgba(255, 255, 255, 0.1)' }}
+          >
+            <AlertTriangle size={18} /> Reset Test Mistakes
           </button>
           <button 
             className="glass-button primary" 

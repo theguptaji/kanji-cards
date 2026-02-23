@@ -48,7 +48,7 @@ const StudyInterface = () => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', padding: '24px' }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100dvh', padding: 'max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom))' }}>
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
         <button className="glass-button" onClick={() => navigate('/')}>
           <Home size={20} /> Home

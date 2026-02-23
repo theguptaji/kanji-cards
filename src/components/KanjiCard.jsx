@@ -24,7 +24,7 @@ const KanjiCard = ({ kanjiData }) => {
   return (
     <div 
       className={`kanji-card hover-scale animate-slide-up ${isFlipped ? 'flipped' : ''}`}
-      style={{ width: '100%', maxWidth: '380px', height: '480px', perspective: '1000px', cursor: 'pointer', margin: '0 auto' }}
+      style={{ width: '100%', maxWidth: '380px', height: '65svh', minHeight: '400px', maxHeight: '480px', perspective: '1000px', cursor: 'pointer', margin: '0 auto' }}
       onClick={() => setIsFlipped(!isFlipped)}
     >
       <div className="kanji-card-inner">

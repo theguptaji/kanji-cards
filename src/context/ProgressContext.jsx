@@ -34,7 +34,28 @@ export const ProgressProvider = ({ children }) => {
     localStorage.setItem('kanjiNotes', JSON.stringify(newNotes));
   };
 
-  const resetProgress = () => {
+  const resetProgressAll = () => {
+    setProgress({});
+    localStorage.removeItem('kanjiProgress');
+  };
+
+  const resetNeedsReview = () => {
+    const newProgress = { ...progress };
+    Object.keys(newProgress).forEach(key => {
+      if (newProgress[key] === 'revisit') {
+        delete newProgress[key];
+      }
+    });
+    setProgress(newProgress);
+    localStorage.setItem('kanjiProgress', JSON.stringify(newProgress));
+  };
+
+  const resetNotes = () => {
+    setNotes({});
+    localStorage.removeItem('kanjiNotes');
+  };
+
+  const resetAll = () => {
     setProgress({});
     setNotes({});
     localStorage.removeItem('kanjiProgress');
@@ -42,7 +63,7 @@ export const ProgressProvider = ({ children }) => {
   };
 
   return (
-    <ProgressContext.Provider value={{ progress, updateProgress, notes, updateNote, resetProgress }}>
+    <ProgressContext.Provider value={{ progress, updateProgress, notes, updateNote, resetProgressAll, resetNeedsReview, resetNotes, resetAll }}>
       {children}
     </ProgressContext.Provider>
   );

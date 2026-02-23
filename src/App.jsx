@@ -3,18 +3,28 @@ import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-route
 import { ProgressProvider, useProgress } from './context/ProgressContext';
 import StudyInterface from './pages/StudyInterface';
 import LevelTest from './pages/LevelTest';
-import { BookOpen, GraduationCap, Flame, Star, Zap, RefreshCcw, Edit3, Search } from 'lucide-react';
+import { BookOpen, GraduationCap, Flame, Star, Zap, RefreshCcw, Edit3, Search, Trash2, Settings, AlertTriangle } from 'lucide-react';
 import { fetchMetadata, fetchKanjiLevel, fetchSearchIndex } from './data/api';
 
 const Home = () => {
   const navigate = useNavigate();
-  const { progress, notes } = useProgress();
+  const { progress, notes, resetProgressAll, resetNeedsReview, resetNotes, resetAll } = useProgress();
 
   const [metadata, setMetadata] = useState({});
   const [decks, setDecks] = useState({});
   const [searchIndex, setSearchIndex] = useState([]);
   const [query, setQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, title: '', message: '', onConfirm: null, isDanger: false });
+
+  const openConfirm = (title, message, onConfirm, isDanger = false) => {
+    setConfirmModal({ isOpen: true, title, message, onConfirm, isDanger });
+  };
+
+  const closeConfirm = () => {
+    setConfirmModal({ ...confirmModal, isOpen: false });
+  };
 
   useEffect(() => {
     fetchMetadata().then(setMetadata);
@@ -233,6 +243,65 @@ const Home = () => {
            </div>
          </div>
       </div>
+
+      <div className="glass-panel animate-slide-up delay-6" style={{ marginTop: '40px', padding: '32px' }}>
+        <h2 style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '0 0 24px 0', fontSize: '1.5rem', color: 'var(--text-primary)' }}>
+          <div style={{ background: 'rgba(255, 255, 255, 0.1)', padding: '8px', borderRadius: '50%', display: 'flex' }}>
+            <Settings size={20} />
+          </div>
+          Data Management
+        </h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+          <button 
+            className="glass-button" 
+            onClick={() => openConfirm('Reset Progress', 'Are you sure you want to reset all your progress? This cannot be undone.', () => { resetProgressAll(); closeConfirm(); })}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', border: '1px solid rgba(255, 255, 255, 0.1)' }}
+          >
+            <RefreshCcw size={18} /> Reset Progress
+          </button>
+          <button 
+            className="glass-button" 
+            onClick={() => openConfirm('Reset Needs Review', 'Are you sure you want to reset all Needs Review kanjis?', () => { resetNeedsReview(); closeConfirm(); })}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', border: '1px solid rgba(255, 255, 255, 0.1)' }}
+          >
+            <RefreshCcw size={18} /> Reset Needs Review
+          </button>
+          <button 
+            className="glass-button" 
+            onClick={() => openConfirm('Reset Notes', 'Are you sure you want to delete all your personal notes? This cannot be undone.', () => { resetNotes(); closeConfirm(); })}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', border: '1px solid rgba(255, 255, 255, 0.1)' }}
+          >
+            <Trash2 size={18} /> Reset Notes
+          </button>
+          <button 
+            className="glass-button primary" 
+            onClick={() => openConfirm('Delete All Data', 'Are you sure you want to reset EVERYTHING (progress and notes)? This cannot be undone.', () => { resetAll(); closeConfirm(); }, true)}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'rgba(239, 71, 111, 0.2)', color: '#ef476f', border: '1px solid rgba(239, 71, 111, 0.3)' }}
+          >
+            <AlertTriangle size={18} /> Delete All Data
+          </button>
+        </div>
+      </div>
+
+      {confirmModal.isOpen && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)' }}>
+          <div className="glass-panel animate-slide-up" style={{ padding: '32px', maxWidth: '400px', width: '90%', textAlign: 'center', border: `1px solid ${confirmModal.isDanger ? 'rgba(239, 71, 111, 0.5)' : 'var(--card-border)'}`, boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }}>
+            <AlertTriangle size={48} color={confirmModal.isDanger ? '#ef476f' : 'var(--primary)'} style={{ margin: '0 auto 16px' }} />
+            <h3 style={{ fontSize: '1.5rem', marginBottom: '16px', color: 'var(--text-primary)' }}>{confirmModal.title}</h3>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '32px' }}>{confirmModal.message}</p>
+            <div style={{ display: 'flex', gap: '16px' }}>
+              <button className="glass-button" style={{ flex: 1 }} onClick={closeConfirm}>Cancel</button>
+              <button 
+                className="glass-button primary" 
+                style={{ flex: 1, background: confirmModal.isDanger ? '#ef476f' : 'var(--primary)', color: 'white', border: 'none' }} 
+                onClick={confirmModal.onConfirm}
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
